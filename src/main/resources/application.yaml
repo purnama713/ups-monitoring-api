@@ -2,10 +2,10 @@ spring:
   application:
     name: ups-monitoring-api
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ryzen5600
-    url: JDBC:mysql://localhost:3306/belajar_springboot_restful_api?useSSL=false&serverTimezone=UTC
+    url: JDBC:mysql://localhost:3306/ups_monitoring_dev?useSSL=false&serverTimezone=UTC
     type: com.zaxxer.hikari.HikariDataSource
     Hikari:
       minimum-idle: 10
@@ -15,4 +15,6 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-
+  server:
+    address: 0.0.0.0
+    port: 8080
