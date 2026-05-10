@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class UpdateDeviceRequest {
 
     @JsonIgnore
-    @NotNull
-    private Integer id;
+    @NotBlank
+    private String code;
 
     @NotBlank
     @Size(max = 50)

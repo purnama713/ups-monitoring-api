@@ -29,37 +29,37 @@ public class DeviceController {
     }
 
     @GetMapping(
-            path = "/api/devices/{deviceId}",
+            path = "/api/devices/{deviceCode}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<DeviceResponse> get(User user, @PathVariable("deviceId") Integer deviceId) {
-        DeviceResponse deviceResponse = deviceService.get(user, deviceId);
+    public WebResponse<DeviceResponse> get(User user, @PathVariable("deviceCode") String deviceCode) {
+        DeviceResponse deviceResponse = deviceService.get(user, deviceCode);
         return WebResponse.<DeviceResponse>builder().data(deviceResponse).build();
     }
 
     @PutMapping(
-            path = "/api/devices/{deviceId}",
+            path = "/api/devices/{deviceCode}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<DeviceResponse> update(User user, @RequestBody UpdateDeviceRequest request,  @PathVariable("deviceId") Integer deviceId) {
-        request.setId(deviceId);
+    public WebResponse<DeviceResponse> update(User user, @RequestBody UpdateDeviceRequest request,  @PathVariable("deviceCode") String deviceCode) {
+        request.setCode(deviceCode);
 
         DeviceResponse deviceResponse = deviceService.update(user, request);
         return WebResponse.<DeviceResponse>builder().data(deviceResponse).build();
     }
 
     @DeleteMapping(
-            path = "/api/devices/{deviceId}",
+            path = "/api/devices/{deviceCode}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> delete(User user, @PathVariable("deviceId") Integer deviceId) {
-        deviceService.delete(user, deviceId);
+    public WebResponse<String> delete(User user, @PathVariable("deviceCode") String deviceCode) {
+        deviceService.delete(user, deviceCode);
         return WebResponse.<String>builder().data("OK").build();
     }
 
     @GetMapping(
-            path = "/api/users/current/devices",
+            path = "/api/devices",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<List<DeviceResponse>> getAll(User user) {

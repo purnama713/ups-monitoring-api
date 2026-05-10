@@ -27,12 +27,20 @@ CREATE TABLE devices (
 
 CREATE TABLE device_logs (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    device_id INT NOT NULL,
+    device_code VARCHAR(20) NOT NULL,
     battery_voltage JSON,
     input_voltage DOUBLE,
     charging_state VARCHAR(20),
     recorded_at TIMESTAMP,
     PRIMARY KEY (id),
-    FOREIGN KEY fk_devices_device_logs (device_id) REFERENCES devices (id)
+    FOREIGN KEY fk_devices_device_logs (device_code) REFERENCES devices (code)
 ) ENGINE InnoDB;
 
+CREATE TABLE api_keys (
+    id INT NOT NULL AUTO_INCREMENT,
+    device_code VARCHAR(20) NOT NULL,
+    api_key VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY fk_devices_api_keys (device_code) REFERENCES devices (code)
+) ENGINE InnoDB;
