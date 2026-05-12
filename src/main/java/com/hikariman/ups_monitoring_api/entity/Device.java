@@ -45,6 +45,6 @@ public class Device {
     @OneToMany(mappedBy = "device")
     private List<DeviceLog> deviceLogs;
 
-    @OneToOne(mappedBy = "device")
+    @OneToOne(mappedBy = "device", cascade = CascadeType.ALL)
     private ApiKey apiKey;
 }

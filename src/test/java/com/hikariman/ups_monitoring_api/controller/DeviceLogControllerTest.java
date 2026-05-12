@@ -76,7 +76,7 @@ class DeviceLogControllerTest {
 
         ApiKey apiKey = new ApiKey();
         apiKey.setDevice(device);
-        apiKey.setApiKey("testapikey");
+        apiKey.setApiKey(BCrypt.hashpw("testapikey", BCrypt.gensalt()));
         apiKeyRepository.save(apiKey);
     }
 
@@ -107,7 +107,7 @@ class DeviceLogControllerTest {
 
     @Test
     void getAllByDevice() throws Exception {
-        Device device = deviceRepository.findById(233).orElseThrow();
+        Device device = deviceRepository.findByCode("UPS-261220-ABCD").orElseThrow();
 
         for (double i = 0; i < 10; i++) {
             DeviceLog deviceLog = new DeviceLog();
@@ -121,7 +121,7 @@ class DeviceLogControllerTest {
         }
 
         mockMvc.perform(
-                get("/api/devices/233/logs")
+                get("/api/devices/UPS-261220-ABCD/logs")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")

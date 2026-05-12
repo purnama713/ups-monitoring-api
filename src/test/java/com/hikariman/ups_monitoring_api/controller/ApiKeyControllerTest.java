@@ -84,7 +84,7 @@ class ApiKeyControllerTest {
     @Test
     void update() throws Exception {
         mockMvc.perform(
-                put("/api/devices/UPS-261220-ABCD/api-keys/1")
+                put("/api/devices/UPS-261220-ABCD/api-keys")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")

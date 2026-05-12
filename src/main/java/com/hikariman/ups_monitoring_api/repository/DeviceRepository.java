@@ -18,7 +18,7 @@ public interface DeviceRepository extends JpaRepository<Device,Integer> {
 
     Optional<Device> findByCode(String code);
 
-//    Optional<Device> findFirstByCodeAndApiKey(String code, ApiKey apiKey);
+    Optional<Device> findFirstByApiKeyAndCode(ApiKey apiKey, String code);
 
     List<Device> findAllByUser(User user);
 }
