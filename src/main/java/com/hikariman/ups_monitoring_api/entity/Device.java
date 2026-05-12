@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -24,7 +25,9 @@ public class Device {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "code", unique = true)
     private String code;
+
     private String name;
     private String location;
 
@@ -41,4 +44,7 @@ public class Device {
 
     @OneToMany(mappedBy = "device")
     private List<DeviceLog> deviceLogs;
+
+    @OneToOne(mappedBy = "device", cascade = CascadeType.ALL)
+    private ApiKey apiKey;
 }

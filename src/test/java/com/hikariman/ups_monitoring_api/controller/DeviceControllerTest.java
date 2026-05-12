@@ -94,7 +94,7 @@ class DeviceControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -108,7 +108,7 @@ class DeviceControllerTest {
 
     @Test
     void getSuccess() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);
@@ -122,7 +122,7 @@ class DeviceControllerTest {
                 get("/api/devices/" + device.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", "test")
+                        .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -139,7 +139,7 @@ class DeviceControllerTest {
 
     @Test
     void getUnauthorized() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);
@@ -165,7 +165,7 @@ class DeviceControllerTest {
 
     @Test
     void getNotFound() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);
@@ -179,7 +179,7 @@ class DeviceControllerTest {
                 get("/api/devices/" + 123)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", "test")
+                        .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
@@ -191,7 +191,7 @@ class DeviceControllerTest {
 
     @Test
     void updateSuccess() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);
@@ -211,7 +211,7 @@ class DeviceControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -237,7 +237,7 @@ class DeviceControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "test")
+                        .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isBadRequest()
         ).andDo(result -> {
@@ -252,7 +252,7 @@ class DeviceControllerTest {
 
     @Test
     void updateUnauthorized() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);
@@ -284,7 +284,7 @@ class DeviceControllerTest {
 
     @Test
     void deleteSuccess() throws Exception {
-        User user = userRepository.findById("test").orElseThrow();
+        User user = userRepository.findById("usertest").orElseThrow();
 
         Device device = new Device();
         device.setUser(user);

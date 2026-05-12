@@ -1,12 +1,17 @@
 package com.hikariman.ups_monitoring_api.controller;
 
+import com.hikariman.ups_monitoring_api.entity.ApiKey;
 import com.hikariman.ups_monitoring_api.entity.Device;
 import com.hikariman.ups_monitoring_api.entity.DeviceLog;
+import com.hikariman.ups_monitoring_api.entity.User;
 import com.hikariman.ups_monitoring_api.model.CreateDeviceLogRequest;
 import com.hikariman.ups_monitoring_api.model.DeviceLogResponse;
 import com.hikariman.ups_monitoring_api.model.WebResponse;
+import com.hikariman.ups_monitoring_api.repository.ApiKeyRepository;
 import com.hikariman.ups_monitoring_api.repository.DeviceLogRepository;
 import com.hikariman.ups_monitoring_api.repository.DeviceRepository;
+import com.hikariman.ups_monitoring_api.repository.UserRepository;
+import com.hikariman.ups_monitoring_api.security.BCrypt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,12 @@ class DeviceLogControllerTest {
     private DeviceRepository deviceRepository;
 
     @Autowired
+    private ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -43,6 +54,30 @@ class DeviceLogControllerTest {
     @BeforeEach
     void setUp() {
         deviceLogRepository.deleteAll();
+        apiKeyRepository.deleteAll();
+        deviceRepository.deleteAll();
+        userRepository.deleteAll();
+
+        User user = new User();
+        user.setUsername("usertest");
+        user.setPassword(BCrypt.hashpw("test123", BCrypt.gensalt()));
+        user.setName("hikariman");
+        user.setToken("testtoken");
+        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
+        userRepository.save(user);
+
+        Device device = new Device();
+        device.setUser(user);
+        device.setCode("UPS-261220-ABCD");
+        device.setName("APC 600va");
+        device.setBatteryCount(2);
+        device.setLocation("Bedroom");
+        deviceRepository.save(device);
+
+        ApiKey apiKey = new ApiKey();
+        apiKey.setDevice(device);
+        apiKey.setApiKey(BCrypt.hashpw("testapikey", BCrypt.gensalt()));
+        apiKeyRepository.save(apiKey);
     }
 
     @Test
@@ -55,11 +90,12 @@ class DeviceLogControllerTest {
         request.setInputVoltage(220.0);
 
         mockMvc.perform(
-                post("/api/devices/233/logs")
+                post("/api/devices/UPS-261220-ABCD/logs")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "testtoken")
+                        .header("X-API-KEY", "testapikey")
+                        .header("X-DEVICE-CODE", "UPS-261220-ABCD")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
@@ -71,7 +107,7 @@ class DeviceLogControllerTest {
 
     @Test
     void getAllByDevice() throws Exception {
-        Device device = deviceRepository.findById(233).orElseThrow();
+        Device device = deviceRepository.findByCode("UPS-261220-ABCD").orElseThrow();
 
         for (double i = 0; i < 10; i++) {
             DeviceLog deviceLog = new DeviceLog();
@@ -85,7 +121,7 @@ class DeviceLogControllerTest {
         }
 
         mockMvc.perform(
-                get("/api/devices/233/logs")
+                get("/api/devices/UPS-261220-ABCD/logs")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")
@@ -98,7 +134,4 @@ class DeviceLogControllerTest {
         });
     }
 
-    @Test
-    void delete() {
-    }
 }

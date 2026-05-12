@@ -1,5 +1,6 @@
 package com.hikariman.ups_monitoring_api.controller;
 
+import com.hikariman.ups_monitoring_api.entity.ApiKey;
 import com.hikariman.ups_monitoring_api.entity.User;
 import com.hikariman.ups_monitoring_api.model.CreateDeviceLogRequest;
 import com.hikariman.ups_monitoring_api.model.DeviceLogResponse;
@@ -20,26 +21,26 @@ public class DeviceLogController {
     DeviceLogService deviceLogService;
 
     @PostMapping(
-            path = "/api/devices/{deviceId}/logs",
+            path = "/api/devices/{deviceCode}/logs",
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<DeviceLogResponse> create(
+    public WebResponse<DeviceLogResponse> create(ApiKey apiKey,
                                                  @RequestBody CreateDeviceLogRequest request,
-                                                 @PathVariable Integer deviceId) {
-        request.setDeviceId(deviceId);
-        DeviceLogResponse deviceLogResponse = deviceLogService.create(request);
+                                                 @PathVariable String deviceCode) {
+        request.setDeviceCode(deviceCode);
+        DeviceLogResponse deviceLogResponse = deviceLogService.create(apiKey, request);
 
         return WebResponse.<DeviceLogResponse>builder().data(deviceLogResponse).build();
     }
 
     @GetMapping(
-            path = "/api/devices/{deviceId}/logs",
+            path = "/api/devices/{deviceCode}/logs",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<DeviceLogResponse>> getAllByDevice(User user, @PathVariable Integer deviceId) {
+    public WebResponse<List<DeviceLogResponse>> getAllByDevice(User user, @PathVariable String deviceCode) {
 
-        Page<DeviceLogResponse> deviceLogResponse = deviceLogService.getAllByDevice(user, deviceId);
+        Page<DeviceLogResponse> deviceLogResponse = deviceLogService.getAllByDevice(user, deviceCode);
 
         return WebResponse.<List<DeviceLogResponse>>builder()
                 .data(deviceLogResponse.getContent())

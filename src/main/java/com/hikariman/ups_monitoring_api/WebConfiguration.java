@@ -1,5 +1,6 @@
 package com.hikariman.ups_monitoring_api;
 
+import com.hikariman.ups_monitoring_api.resolver.ApiKeyArgumentResolver;
 import com.hikariman.ups_monitoring_api.resolver.UserArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +15,13 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Autowired
     private UserArgumentResolver userArgumentResolver;
 
+    @Autowired
+    private ApiKeyArgumentResolver apiKeyArgumentResolver;
+
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         WebMvcConfigurer.super.addArgumentResolvers(resolvers);
         resolvers.add(userArgumentResolver);
+        resolvers.add(apiKeyArgumentResolver);
     }
 }

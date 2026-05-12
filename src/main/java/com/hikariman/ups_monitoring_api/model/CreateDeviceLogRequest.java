@@ -1,6 +1,7 @@
 package com.hikariman.ups_monitoring_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,8 @@ import java.util.Map;
 public class CreateDeviceLogRequest {
 
     @JsonIgnore
-    @NotNull
-    private Integer deviceId;
+    @NotBlank
+    private String deviceCode;
 
     private Map<String, Double> batteryVoltage;
 

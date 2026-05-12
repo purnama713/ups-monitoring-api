@@ -16,7 +16,7 @@ public class DeviceLogResponse {
 
     public Long id;
 
-    public Integer deviceId;
+    public String deviceId;
 
     public Map<String, Double> batteryVoltage;
 

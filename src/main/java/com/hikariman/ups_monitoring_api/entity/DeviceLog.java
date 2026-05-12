@@ -41,6 +41,6 @@ public class DeviceLog {
     private Instant recordedAt;
 
     @ManyToOne
-    @JoinColumn(name = "device_id", referencedColumnName = "id")
+    @JoinColumn(name = "device_code", referencedColumnName = "code")
     private Device device;
 }

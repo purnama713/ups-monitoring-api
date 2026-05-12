@@ -38,16 +38,16 @@ public class DeviceService {
     public List<DeviceResponse> getAllDevices(User user) {
         List<Device> devices = deviceRepository.findAllByUser(user);
 
-//        if (devices.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-//        }
+        if (devices.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found");
+        }
 
         return devices.stream().map(this::toDeviceResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public DeviceResponse get(User user, Integer id) {
-        Device device = deviceRepository.findFirstByUserAndId(user, id)
+    public DeviceResponse get(User user, String code) {
+        Device device = deviceRepository.findFirstByUserAndCode(user, code)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
 
         return toDeviceResponse(device);
@@ -72,7 +72,7 @@ public class DeviceService {
     public DeviceResponse update(User user, UpdateDeviceRequest request) {
         validationService.validate(request);
 
-        Device device = deviceRepository.findFirstByUserAndId(user, request.getId())
+        Device device = deviceRepository.findFirstByUserAndCode(user, request.getCode())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
 
         device.setName(request.getName());
@@ -84,8 +84,8 @@ public class DeviceService {
     }
 
     @Transactional
-    public void delete(User user, Integer id) {
-        Device device = deviceRepository.findFirstByUserAndId(user, id)
+    public void delete(User user, String code) {
+        Device device = deviceRepository.findFirstByUserAndCode(user, code)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
 
         deviceRepository.delete(device);
