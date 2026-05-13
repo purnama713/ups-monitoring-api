@@ -4,7 +4,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password:
+    password: ${DB_PASSWORD}
     url: JDBC:mysql://localhost:3306/ups_monitoring_dev?useSSL=false&serverTimezone=UTC
     type: com.zaxxer.hikari.HikariDataSource
     Hikari:
@@ -13,6 +13,7 @@ spring:
   jpa:
     properties:
       hibernate:
+        ddl-auto: none
         format_sql: true
         show_sql: true
 
@@ -20,10 +21,10 @@ spring:
     address: 0.0.0.0
     port: 8080
 
-logging:
-  level:
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: TRACE
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        orm:
+#          jdbc:
+#            bind: TRACE

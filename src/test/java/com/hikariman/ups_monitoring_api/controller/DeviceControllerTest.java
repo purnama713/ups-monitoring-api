@@ -53,38 +53,8 @@ class DeviceControllerTest {
     }
 
     @Test
-    void createSuccess() throws Exception {
-        CreateDeviceRequest request = new CreateDeviceRequest();
-        request.setCode("test-1");
-        request.setName("APC");
-        request.setLocation("bedroom");
-        request.setBatteryCount(2);
-
-        mockMvc.perform(
-                post("/api/devices")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header("X-API-TOKEN", "testtoken")
-        ).andExpectAll(
-                status().isOk()
-        ).andDo(result -> {
-            WebResponse<DeviceResponse> response = objectMapper.readValue(result
-                    .getResponse()
-                    .getContentAsString(), new TypeReference<>(){});
-
-            assertNull(response.getErrors());
-            assertEquals("APC", response.getData().getName());
-            assertEquals(2, response.getData().getBatteryCount());
-            assertEquals("test-1", response.getData().getCode());
-            assertEquals("bedroom", response.getData().getLocation());
-        });
-    }
-
-    @Test
     void createBadRequest() throws Exception {
         CreateDeviceRequest request = new CreateDeviceRequest();
-        request.setCode("test-1");
         request.setName("test");
         request.setLocation("bedroom");
         request.setBatteryCount(-1);
@@ -107,6 +77,57 @@ class DeviceControllerTest {
     }
 
     @Test
+    void createUnauthorized() throws Exception {
+        CreateDeviceRequest request = new CreateDeviceRequest();
+        request.setName("test");
+        request.setLocation("bedroom");
+        request.setBatteryCount(2);
+
+        mockMvc.perform(
+                post("/api/devices")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "testsalahtoken")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<DeviceResponse> response = objectMapper.readValue(result
+                    .getResponse()
+                    .getContentAsString(), new TypeReference<>(){});
+
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void createSuccess() throws Exception {
+        CreateDeviceRequest request = new CreateDeviceRequest();
+        request.setName("Inforce");
+        request.setLocation("bedroom");
+        request.setBatteryCount(2);
+
+        mockMvc.perform(
+                post("/api/devices")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "testtoken")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<DeviceResponse> response = objectMapper.readValue(result
+                    .getResponse()
+                    .getContentAsString(), new TypeReference<>(){});
+
+            assertNull(response.getErrors());
+            assertEquals("Inforce", response.getData().getName());
+            assertEquals(2, response.getData().getBatteryCount());
+            assertEquals("bedroom", response.getData().getLocation());
+        });
+    }
+
+    @Test
     void getSuccess() throws Exception {
         User user = userRepository.findById("usertest").orElseThrow();
 
@@ -119,7 +140,7 @@ class DeviceControllerTest {
         deviceRepository.save(device);
 
         mockMvc.perform(
-                get("/api/devices/" + device.getId())
+                get("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")
@@ -150,7 +171,7 @@ class DeviceControllerTest {
         deviceRepository.save(device);
 
         mockMvc.perform(
-                get("/api/devices/" + device.getId())
+                get("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "t")
@@ -195,7 +216,7 @@ class DeviceControllerTest {
 
         Device device = new Device();
         device.setUser(user);
-        device.setCode("test-1");
+        device.setCode("UPS-123456-ABCD");
         device.setName("test");
         device.setLocation("bedroom");
         device.setBatteryCount(2);
@@ -207,7 +228,7 @@ class DeviceControllerTest {
         request.setBatteryCount(3);
 
         mockMvc.perform(
-                put("/api/devices/" + device.getId())
+                put("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -228,12 +249,22 @@ class DeviceControllerTest {
 
     @Test
     void updateBadRequest() throws Exception {
+        User user = userRepository.findById("usertest").orElseThrow();
+
+        Device device = new Device();
+        device.setUser(user);
+        device.setCode("UPS-123456-ABCD");
+        device.setName("test");
+        device.setLocation("bedroom");
+        device.setBatteryCount(2);
+        deviceRepository.save(device);
+
         UpdateDeviceRequest request = new UpdateDeviceRequest();
         request.setName("Inforce");
         request.setLocation("Gudang");
 
         mockMvc.perform(
-                put("/api/devices/129")
+                put("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -244,7 +275,7 @@ class DeviceControllerTest {
             WebResponse<String> response = objectMapper
                     .readValue(result
                             .getResponse()
-                            .getContentAsString(), new TypeReference<WebResponse<String>>(){});
+                            .getContentAsString(), new TypeReference<>(){});
 
             assertNotNull(response.getErrors());
         });
@@ -268,7 +299,7 @@ class DeviceControllerTest {
         request.setBatteryCount(3);
 
         mockMvc.perform(
-                put("/api/devices/" + device.getId())
+                put("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -276,7 +307,7 @@ class DeviceControllerTest {
         ).andExpectAll(
                 status().isUnauthorized()
         ).andDo(result -> {
-            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>(){});
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
 
             assertNotNull(response.getErrors());
         });
@@ -295,14 +326,14 @@ class DeviceControllerTest {
         deviceRepository.save(device);
 
         mockMvc.perform(
-                delete("/api/devices/" + device.getId())
+                delete("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>(){});
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
 
             assertNull(response.getErrors());
             assertEquals("OK", response.getData());
@@ -322,14 +353,14 @@ class DeviceControllerTest {
         deviceRepository.save(device);
 
         mockMvc.perform(
-                delete("/api/devices/" + device.getId())
+                delete("/api/devices/" + device.getCode())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testsalah")
         ).andExpectAll(
                 status().isUnauthorized()
         ).andDo(result -> {
-            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>(){});
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
 
             assertNotNull(response.getErrors());
         });
@@ -345,7 +376,7 @@ class DeviceControllerTest {
         ).andExpectAll(
                 status().isNotFound()
         ).andDo(result -> {
-            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>(){});
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
 
             assertNotNull(response.getErrors());
         });
@@ -366,7 +397,7 @@ class DeviceControllerTest {
         }
 
         mockMvc.perform(
-                get("/api/users/current/devices")
+                get("/api/devices")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "testtoken")
@@ -384,7 +415,7 @@ class DeviceControllerTest {
     @Test
     void getAllUnauthorized() throws Exception {
         mockMvc.perform(
-                get("/api/users/current/devices")
+                get("/api/devices")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-API-TOKEN", "salah")

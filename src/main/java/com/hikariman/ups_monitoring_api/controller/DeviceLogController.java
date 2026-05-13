@@ -53,14 +53,14 @@ public class DeviceLogController {
     }
 
     @DeleteMapping(
-            path = "/api/device/{deviceId}/logs/{deviceLogId}",
+            path = "/api/device/{deviceCode}/logs/{deviceLogId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<String> delete(User user,
-                                                 @PathVariable Integer deviceId,
+                                                 @PathVariable String deviceCode,
                                                  @PathVariable Long deviceLogId) {
 
-        deviceLogService.delete(user, deviceId, deviceLogId);
+        deviceLogService.delete(user, deviceCode, deviceLogId);
         return WebResponse.<String>builder().data("OK").build();
     }
 }

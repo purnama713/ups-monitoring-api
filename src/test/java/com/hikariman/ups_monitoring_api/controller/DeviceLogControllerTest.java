@@ -81,7 +81,57 @@ class DeviceLogControllerTest {
     }
 
     @Test
-    void create() throws Exception {
+    void createUnauthorizedApiKey() throws Exception {
+        CreateDeviceLogRequest request = new CreateDeviceLogRequest();
+        request.setChargingState("Discharging");
+        request.setBatteryVoltage(Map.of(
+                "cell_1", 14.2,
+                "cell_2", 14.4));
+        request.setInputVoltage(220.0);
+
+        mockMvc.perform(
+                post("/api/devices/UPS-261220-ABCD/logs")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-KEY", "testapikeyy")
+                        .header("X-DEVICE-CODE", "UPS-261220-ABCD")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<DeviceLogResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void createUnauthorizedDeviceCode() throws Exception {
+        CreateDeviceLogRequest request = new CreateDeviceLogRequest();
+        request.setChargingState("Discharging");
+        request.setBatteryVoltage(Map.of(
+                "cell_1", 14.2,
+                "cell_2", 14.4));
+        request.setInputVoltage(220.0);
+
+        mockMvc.perform(
+                post("/api/devices/UPS-261220-ABCD/logs")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-KEY", "testapikey")
+                        .header("X-DEVICE-CODE", "UPS-261220-ABC")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<DeviceLogResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void createSuccess() throws Exception {
         CreateDeviceLogRequest request = new CreateDeviceLogRequest();
         request.setChargingState("Discharging");
         request.setBatteryVoltage(Map.of(
@@ -134,4 +184,61 @@ class DeviceLogControllerTest {
         });
     }
 
+    @Test
+    void getAllByDeviceUnauthorized() throws Exception {
+        Device device = deviceRepository.findByCode("UPS-261220-ABCD").orElseThrow();
+
+        for (double i = 0; i < 10; i++) {
+            DeviceLog deviceLog = new DeviceLog();
+            deviceLog.setDevice(device);
+            deviceLog.setChargingState("Charging");
+            deviceLog.setBatteryVoltage(Map.of(
+                    "cell_1", 14.2+(i/10),
+                    "cell_2", 14.4+(i/10)));
+            deviceLog.setInputVoltage(220.0+(i/10));
+            deviceLogRepository.save(deviceLog);
+        }
+
+        mockMvc.perform(
+                get("/api/devices/UPS-261220-ABCD/logs")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-API-TOKEN", "testsalahtoken")
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<List<DeviceLogResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void getAllByDeviceNotFound() throws Exception {
+        Device device = deviceRepository.findByCode("UPS-261220-ABCD").orElseThrow();
+
+        for (double i = 0; i < 10; i++) {
+            DeviceLog deviceLog = new DeviceLog();
+            deviceLog.setDevice(device);
+            deviceLog.setChargingState("Charging");
+            deviceLog.setBatteryVoltage(Map.of(
+                    "cell_1", 14.2+(i/10),
+                    "cell_2", 14.4+(i/10)));
+            deviceLog.setInputVoltage(220.0+(i/10));
+            deviceLogRepository.save(deviceLog);
+        }
+
+        mockMvc.perform(
+                get("/api/devices/UPS-261220-ABC/logs")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-API-TOKEN", "testtoken")
+        ).andExpectAll(
+                status().isNotFound()
+        ).andDo(result -> {
+            WebResponse<List<DeviceLogResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>(){});
+
+            assertNotNull(response.getErrors());
+        });
+    }
 }

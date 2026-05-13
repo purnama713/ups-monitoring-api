@@ -14,9 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CreateDeviceRequest {
-    @NotBlank
-    @Size(max=25)
-    private String code;
 
     @NotBlank
     @Size(max=50)

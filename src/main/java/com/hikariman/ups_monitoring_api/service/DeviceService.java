@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DeviceService {
@@ -57,8 +60,11 @@ public class DeviceService {
     public DeviceResponse create(User user, CreateDeviceRequest request) {
         validationService.validate(request);
 
+        String shortUuid = UUID.randomUUID().toString().substring(0, 8);
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+
         Device device = new Device();
-        device.setCode(request.getCode());
+        device.setCode("UPS-" + date + "-" + shortUuid);
         device.setName(request.getName());
         device.setLocation(request.getLocation());
         device.setBatteryCount(request.getBatteryCount());

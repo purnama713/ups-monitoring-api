@@ -30,8 +30,8 @@ public class ApiKeyController {
             path = "/api/devices/{deviceCode}/api-keys",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<ApiKeyResponse> update(@PathVariable String deviceCode) {
-        ApiKeyResponse apiKeyResponse = apiKeyService.update(deviceCode);
+    public WebResponse<ApiKeyResponse> update(User user, @PathVariable String deviceCode) {
+        ApiKeyResponse apiKeyResponse = apiKeyService.update(user, deviceCode);
         return WebResponse.<ApiKeyResponse>builder().data(apiKeyResponse).build();
     }
 }

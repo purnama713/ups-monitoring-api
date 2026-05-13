@@ -5,6 +5,7 @@ import com.hikariman.ups_monitoring_api.model.CreateUserRequest;
 import com.hikariman.ups_monitoring_api.model.UpdateUserRequest;
 import com.hikariman.ups_monitoring_api.model.UserResponse;
 import com.hikariman.ups_monitoring_api.model.WebResponse;
+import com.hikariman.ups_monitoring_api.repository.DeviceRepository;
 import com.hikariman.ups_monitoring_api.repository.UserRepository;
 import com.hikariman.ups_monitoring_api.security.BCrypt;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +33,14 @@ class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private DeviceRepository deviceRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        deviceRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -56,7 +61,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<String>>() {
+                    .getContentAsString(), new TypeReference<>() {
             });
 
             assertEquals("OK", response.getData());
@@ -80,7 +85,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<String>>() {
+                    .getContentAsString(), new TypeReference<>() {
             });
 
             assertNotNull(response.getErrors());
@@ -110,7 +115,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<String>>() {
+                    .getContentAsString(), new TypeReference<>() {
             });
 
             assertNotNull(response.getErrors());
@@ -137,7 +142,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<UserResponse> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<UserResponse>>() {});
+                    .getContentAsString(), new TypeReference<>() {});
 
             assertNull(response.getErrors());
             assertEquals("usertest", response.getData().getUsername());
@@ -164,36 +169,11 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<String>>() {});
+                    .getContentAsString(), new TypeReference<>() {});
 
             assertNotNull(response.getErrors());
         });
     }
-
-//    @Test
-//    void getNotFound() throws Exception {
-//        User user = new User();
-//        user.setUsername("usertest");
-//        user.setPassword(BCrypt.hashpw("test123", BCrypt.gensalt()));
-//        user.setName("hikariman");
-//        user.setToken("testtoken");
-//        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000L);
-//        userRepository.save(user);
-//
-//        mockMvc.perform(
-//                get("/api/users/salah")
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header("X-API-TOKEN", "testtoken")
-//        ).andExpectAll(
-//                status().isNotFound()
-//        ).andDo(result -> {
-//            WebResponse<String> response = objectMapper.readValue(result
-//                    .getResponse()
-//                    .getContentAsString(), new TypeReference<WebResponse<String>>() {});
-//
-//            assertNotNull(response.getErrors());
-//        });
-//    }
 
     @Test
     void getUnauthorizedTokenNotSend() throws Exception {
@@ -213,7 +193,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<String> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<String>>() {});
+                    .getContentAsString(), new TypeReference<>() {});
 
             assertNotNull(response.getErrors());
         });
@@ -244,7 +224,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<UserResponse> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<UserResponse>>() {});
+                    .getContentAsString(), new TypeReference<>() {});
 
             assertNull(response.getErrors());
             assertEquals("test", response.getData().getUsername());
@@ -281,7 +261,7 @@ class UserControllerTest {
         ).andDo(result -> {
             WebResponse<UserResponse> response = objectMapper.readValue(result
                     .getResponse()
-                    .getContentAsString(), new TypeReference<WebResponse<UserResponse>>() {});
+                    .getContentAsString(), new TypeReference<>() {});
 
             assertNotNull(response.getErrors());
         });

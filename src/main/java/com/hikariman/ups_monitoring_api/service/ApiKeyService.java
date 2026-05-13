@@ -24,9 +24,6 @@ public class ApiKeyService {
     @Autowired
     private DeviceRepository deviceRepository;
 
-    @Autowired
-    private ValidationService validationService;
-
     private ApiKeyResponse toApiKeyResponse(ApiKey apiKey, String key) {
         return ApiKeyResponse
                 .builder()
@@ -55,9 +52,12 @@ public class ApiKeyService {
     }
 
     @Transactional
-    public ApiKeyResponse update(String deviceCode) {
+    public ApiKeyResponse update(User user, String deviceCode) {
 
-        ApiKey apiKey = apiKeyRepository.findFirstByDeviceCode(deviceCode)
+        Device device = deviceRepository.findFirstByUserAndCode(user, deviceCode)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
+
+        ApiKey apiKey = apiKeyRepository.findFirstByDevice(device)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Api Key not found"));
 
         String prefix = "iot_live_";

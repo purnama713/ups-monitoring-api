@@ -6,7 +6,6 @@ import com.hikariman.ups_monitoring_api.entity.DeviceLog;
 import com.hikariman.ups_monitoring_api.entity.User;
 import com.hikariman.ups_monitoring_api.model.CreateDeviceLogRequest;
 import com.hikariman.ups_monitoring_api.model.DeviceLogResponse;
-import com.hikariman.ups_monitoring_api.repository.ApiKeyRepository;
 import com.hikariman.ups_monitoring_api.repository.DeviceLogRepository;
 import com.hikariman.ups_monitoring_api.repository.DeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class DeviceLogService {
     DeviceRepository deviceRepository;
 
     @Autowired
-    ApiKeyRepository apiKeyRepository;
-
-    @Autowired
     ValidationService validationService;
 
     private DeviceLogResponse toDeviceLogResponse(DeviceLog deviceLog) {
@@ -47,8 +43,6 @@ public class DeviceLogService {
     @Transactional
     public DeviceLogResponse create(ApiKey apiKey, CreateDeviceLogRequest request) {
         validationService.validate(request);
-
-
 
         Device device = deviceRepository.findFirstByApiKeyAndCode(apiKey, request.getDeviceCode())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
@@ -93,8 +87,8 @@ public class DeviceLogService {
     }
 
     @Transactional
-    public void delete(User user, Integer deviceId, Long addressId) {
-        Device device = deviceRepository.findFirstByUserAndId(user, deviceId)
+    public void delete(User user, String deviceCode, Long addressId) {
+        Device device = deviceRepository.findFirstByUserAndCode(user, deviceCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
 
         DeviceLog deviceLog = deviceLogRepository.findFirstByDeviceAndId(device, addressId)
